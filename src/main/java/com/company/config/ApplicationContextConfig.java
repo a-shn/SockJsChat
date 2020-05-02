@@ -1,5 +1,6 @@
 package com.company.config;
 
+import com.company.handlers.WebSocketHandlerImpl;
 import com.company.repositories.*;
 import com.company.services.*;
 import com.zaxxer.hikari.HikariConfig;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import org.springframework.web.socket.WebSocketHandler;
 
 import javax.sql.DataSource;
 import java.util.Objects;
@@ -28,6 +30,16 @@ import java.util.Objects;
 public class ApplicationContextConfig {
     @Autowired
     private Environment environment;
+
+    @Bean
+    public WebSocketHandler webSocketHandler() {
+        return new WebSocketHandlerImpl();
+    }
+
+    @Bean
+    public Chatterbox chatterbox() {
+        return new Chatterbox();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -82,6 +94,11 @@ public class ApplicationContextConfig {
         freeMarkerFactoryBean.setPreferFileSystemAccess(true);
         freeMarkerFactoryBean.setDefaultEncoding("UTF-8");
         return freeMarkerFactoryBean;
+    }
+
+    @Bean
+    public RoomsRepository roomsRepository() {
+        return new RoomsRepositoryImpl(jdbcTemplate());
     }
 
     @Bean

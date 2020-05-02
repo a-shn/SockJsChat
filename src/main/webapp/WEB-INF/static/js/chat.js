@@ -3,9 +3,9 @@ sock.onopen = function () {
     console.log('open');
 };
 
-sock.onmessage = function (e) {
-    console.log('message', e.data);
-    sock.close();
+sock.onmessage = function (response) {
+    var json_mes = JSON.parse(response.data)
+    $('#messages').first().after('<li>\'' + json_mes['text'] + '\' - said ' + json_mes["from"] + '</li>');
 };
 
 sock.onclose = function () {
@@ -14,19 +14,6 @@ sock.onclose = function () {
 
 function sendMessage(text) {
     sock.send(text)
-}
-
-function receiveMessage() {
-    $.ajax({
-        url: "/getNewMessage",
-        method: "GET",
-        dataType: "json",
-        contentType: "application/json",
-        success: function (response) {
-            $('#messages').first().after('<li>\'' + response[0]['text'] + '\' - said ' + response[0]["from"] + '</li>');
-            receiveMessage();
-        }
-    })
 }
 
 function initiateMessages() {
@@ -39,7 +26,6 @@ function initiateMessages() {
             for (let i = response.length - 1; i >= 0; i--) {
                 $('#messages').first().after('<li>\'' + response[i]['text'] + '\' - said ' + response[i]["from"] + '</li>');
             }
-            receiveMessage();
         }
     })
 }

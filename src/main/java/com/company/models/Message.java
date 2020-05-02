@@ -11,5 +11,6 @@ import java.time.LocalDateTime;
 public class Message {
     private String from;
     private String text;
+    private long roomId;
     private LocalDateTime time;
 }

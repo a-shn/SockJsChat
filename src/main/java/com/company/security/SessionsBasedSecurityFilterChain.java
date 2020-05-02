@@ -30,10 +30,12 @@ public class SessionsBasedSecurityFilterChain implements Filter {
             HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
             String path = httpServletRequest.getServletPath();
             Cookie[] cookies = httpServletRequest.getCookies();
-            String sessionId = null;
-            for (Cookie cookie: cookies) {
-                if (cookie.getName().equals("sessionId")) {
-                    sessionId = cookie.getValue();
+            String sessionId = "";
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if (cookie.getName().equals("sessionId")) {
+                        sessionId = cookie.getValue();
+                    }
                 }
             }
             if (path.equals("/signin") || path.equals("/signup")) {

@@ -11,9 +11,9 @@ import java.util.List;
 
 public class ChatJdbcTemplateImpl implements ChatRepository {
     //language=SQL
-    private static final String SQL_SELECT_LAST = "SELECT * FROM chat ORDER BY time DESC LIMIT (?)";
+    private static final String SQL_SELECT_LAST = "SELECT * FROM chat WHERE room_id=(?) ORDER BY time DESC LIMIT (?)";
     //language=SQL
-    private static final String SQL_INSERT = "INSERT INTO chat (\"from\", text, time) VALUES (?,?,?)";
+    private static final String SQL_INSERT = "INSERT INTO chat (\"from\", text, room_id, time) VALUES (?,?,?,?)";
 
     private JdbcTemplate jdbcTemplate;
 
@@ -24,13 +24,14 @@ public class ChatJdbcTemplateImpl implements ChatRepository {
     private RowMapper<Message> messageRowMapper = (row, rowNumber) -> {
         String from = row.getString("from");
         String text = row.getString("text");
+        long roomId = row.getLong("room_id");
         LocalDateTime time = row.getTimestamp("time").toLocalDateTime();
-        return new Message(from, text, time);
+        return new Message(from, text, roomId, time);
     };
 
     @Override
-    public List<Message> getLastMessages(int limit) {
-        return jdbcTemplate.query(SQL_SELECT_LAST, new Object[]{limit}, messageRowMapper);
+    public List<Message> getLastMessages(long roomId, int limit) {
+        return jdbcTemplate.query(SQL_SELECT_LAST, new Object[]{roomId, limit}, messageRowMapper);
     }
 
     @Override
@@ -40,7 +41,8 @@ public class ChatJdbcTemplateImpl implements ChatRepository {
                     .prepareStatement(SQL_INSERT);
             statement.setString(1, message.getFrom());
             statement.setString(2, message.getText());
-            statement.setTimestamp(3, Timestamp.valueOf(message.getTime()));
+            statement.setLong(3, message.getRoomId());
+            statement.setTimestamp(4, Timestamp.valueOf(message.getTime()));
             return statement;
         });
 
