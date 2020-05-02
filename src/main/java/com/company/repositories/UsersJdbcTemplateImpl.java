@@ -13,6 +13,8 @@ public class UsersJdbcTemplateImpl implements UsersRepository {
     private static final String SQL_SELECT_BY_EMAIL = "SELECT * FROM users WHERE email = (?)";
     //language=SQL
     private static final String SQL_INSERT = "INSERT INTO users (nickname, email, password) VALUES (?,?,?)";
+    //language=sql
+    private static final String SQL_SELECT_BY_ID = "SELECT * FROM users WHERE user_id=?";
 
     private JdbcTemplate jdbcTemplate;
 
@@ -50,6 +52,16 @@ public class UsersJdbcTemplateImpl implements UsersRepository {
     public Optional<User> findByEmail(String email) {
         try {
             User user = jdbcTemplate.queryForObject(SQL_SELECT_BY_EMAIL, new Object[]{email}, userRowMapper);
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> findById(long id) {
+        try {
+            User user = jdbcTemplate.queryForObject(SQL_SELECT_BY_ID, new Object[]{id}, userRowMapper);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
